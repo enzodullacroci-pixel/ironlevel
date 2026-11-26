@@ -1,0 +1,249 @@
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>IronLevel</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏋️</text></svg>">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="IronLevel">
+<meta name="theme-color" content="#0d0d0d" media="(prefers-color-scheme: dark)">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Inter:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="style.css">
+
+<div class="app">
+  <header class="header" role="banner">
+    <div class="header-top">
+      <div class="level-info">
+        <span class="level-label">Nível</span>
+        <span class="level-value" id="levelDisplay">1</span>
+      </div>
+      <div class="rank-info">
+        <span class="rank-label">Patente</span>
+        <span class="rank-value" id="rankDisplay">Iniciante</span>
+      </div>
+    </div>
+    <div class="xp-bar-container">
+      <div class="xp-labels">
+        <span class="xp-current" id="xpCurrent">0</span>
+        <span class="xp-separator">/</span>
+        <span class="xp-target" id="xpTarget">100</span>
+        <span class="xp-unit">XP</span>
+      </div>
+      <div class="xp-bar-track" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="Progresso de XP">
+        <div class="xp-bar-fill" id="xpBarFill" style="width: 0%"></div>
+      </div>
+    </div>
+  </header>
+
+  <main class="main" role="main">
+    <section class="home-view active" id="homeView" aria-labelledby="homeTitle">
+      <h1 id="homeTitle" class="visually-hidden">Início</h1>
+
+      <section class="home-summary" aria-labelledby="summaryTitle">
+        <div class="stat-grid">
+          <article class="stat-card">
+            <span class="stat-value" id="totalExercises">0</span>
+            <span class="stat-label">Exercícios</span>
+          </article>
+          <article class="stat-card">
+            <span class="stat-value" id="totalWorkouts">0</span>
+            <span class="stat-label">Treinos</span>
+          </article>
+          <article class="stat-card">
+            <span class="stat-value" id="totalVolume">0 kg</span>
+            <span class="stat-label">Volume Total</span>
+          </article>
+          <article class="stat-card">
+            <span class="stat-value" id="daysSinceStart">0</span>
+            <span class="stat-label">Dias</span>
+          </article>
+        </div>
+      </section>
+
+      <section class="home-actions" aria-labelledby="actionsTitle">
+        <h2 id="actionsTitle" class="visually-hidden">Ações rápidas</h2>
+        <button class="btn btn-primary btn-block" id="quickAddExerciseBtn" type="button">
+          <span class="btn-icon" aria-hidden="true">+</span>
+          <span>Cadastrar Exercício</span>
+        </button>
+        <button class="btn btn-secondary btn-block" id="quickManageExercisesBtn" type="button">
+          <span class="btn-icon" aria-hidden="true">📋</span>
+          <span>Gerenciar Exercícios</span>
+        </button>
+      </section>
+
+      <section class="recent-activity" aria-labelledby="recentTitle" hidden>
+        <header class="section-header">
+          <h2 id="recentTitle" class="section-header-title">Atividade Recente</h2>
+        </header>
+        <div class="recent-list" id="recentList" role="list" aria-label="Treinos recentes">
+          <!-- Treinos recentes serão inseridos aqui -->
+        </div>
+      </section>
+    </section>
+
+    <section class="train-view" id="trainView" aria-labelledby="trainTitle" hidden>
+      <h1 id="trainTitle" class="visually-hidden">Treinar</h1>
+
+      <section class="train-section" aria-labelledby="trainSectionTitle">
+        <header class="section-header">
+          <h2 id="trainSectionTitle" class="section-header-title">Sessão de Treino</h2>
+        </header>
+
+        <div class="train-exercises-list" id="trainExercisesList" role="list" aria-label="Exercícios para treinar">
+          <!-- Exercícios para treino serão inseridos aqui -->
+        </div>
+
+        <div class="empty-state" id="emptyTrainState">
+          <div class="empty-icon" aria-hidden="true">📋</div>
+          <p class="empty-title">Nenhum exercício cadastrado</p>
+          <p class="empty-subtitle">Toque em "Cadastrar Exercício" no Início para começar</p>
+        </div>
+      </section>
+    </section>
+
+    <div class="modal-overlay" id="exerciseModal" hidden role="dialog" aria-modal="true" aria-labelledby="exerciseModalTitle">
+      <div class="modal" role="document">
+        <header class="modal-header">
+          <h2 id="exerciseModalTitle" class="modal-title">Novo Exercício</h2>
+          <button class="btn-icon-sm modal-close" id="exerciseModalCloseBtn" type="button" aria-label="Fechar">✕</button>
+        </header>
+        <form class="modal-form" id="exerciseForm">
+          <input type="hidden" id="editExerciseIndex" name="exerciseIndex">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="exerciseName">Nome do exercício</label>
+              <input type="text" id="exerciseName" name="exerciseName" placeholder="Ex: Supino Reto" required maxlength="50" autocomplete="off">
+            </div>
+            <div class="form-group">
+              <label for="exerciseWeight">Carga inicial (kg)</label>
+              <input type="number" id="exerciseWeight" name="exerciseWeight" placeholder="0" min="0" max="500" step="0.5" required inputmode="numeric">
+            </div>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" id="exerciseCancelBtn">Cancelar</button>
+            <button type="submit" class="btn btn-primary" id="exerciseSubmitBtn">Salvar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="workoutModal" hidden role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal" role="document">
+        <header class="modal-header">
+          <h2 id="modalTitle" class="modal-title">Registrar Treino</h2>
+          <button class="btn-icon-sm modal-close" id="modalCloseBtn" type="button" aria-label="Fechar">✕</button>
+        </header>
+        <form class="modal-form" id="workoutForm">
+          <input type="hidden" id="modalExerciseIndex" name="exerciseIndex">
+          <div class="modal-exercise-info" id="modalExerciseInfo"></div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="modalWeight">Carga (kg)</label>
+              <input type="number" id="modalWeight" name="weight" min="0" max="500" step="0.5" required inputmode="numeric" placeholder="0">
+            </div>
+            <div class="form-group">
+              <label for="modalReps">Repetições</label>
+              <input type="number" id="modalReps" name="reps" min="1" max="100" step="1" required inputmode="numeric" placeholder="0">
+            </div>
+          </div>
+          <div class="modal-suggestion" id="modalSuggestion" hidden></div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" id="modalCancelBtn">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Salvar Treino</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="manageExercisesModal" hidden role="dialog" aria-modal="true" aria-labelledby="manageModalTitle">
+      <div class="modal modal-large" role="document">
+        <header class="modal-header">
+          <h2 id="manageModalTitle" class="modal-title">Gerenciar Exercícios</h2>
+          <button class="btn-icon-sm modal-close" id="manageModalCloseBtn" type="button" aria-label="Fechar">✕</button>
+        </header>
+        <div class="modal-body">
+          <div class="manage-list" id="manageExercisesList" role="list" aria-label="Lista de exercícios para gerenciar">
+            <!-- Exercícios para gerenciar -->
+          </div>
+          <div class="empty-state" id="emptyManageState">
+            <div class="empty-icon" aria-hidden="true">📋</div>
+            <p class="empty-title">Nenhum exercício cadastrado</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <section class="settings-view" id="settingsView" aria-labelledby="settingsTitle" hidden>
+      <h1 id="settingsTitle" class="visually-hidden">Configurações</h1>
+      <div class="settings-content">
+        <section class="settings-section">
+          <h2 class="section-title">Segurança de Dados</h2>
+          <p class="section-description">Gerencie seu progresso: exporte backups ou restaure de arquivos salvos.</p>
+
+          <div class="settings-actions">
+            <button class="btn btn-primary" id="exportBtn" type="button">
+              <span class="btn-icon" aria-hidden="true">⬇️</span>
+              <span>Exportar Backup (JSON)</span>
+            </button>
+
+            <div class="import-wrapper">
+              <button class="btn btn-secondary" id="importBtn" type="button">
+                <span class="btn-icon" aria-hidden="true">⬆️</span>
+                <span>Importar Backup (JSON)</span>
+              </button>
+              <input type="file" id="importFile" accept=".json" hidden>
+            </div>
+          </div>
+
+          <div class="import-feedback" id="importFeedback" hidden></div>
+        </section>
+
+        <section class="settings-section">
+          <h2 class="section-title">Informações do App</h2>
+          <div class="info-list">
+            <div class="info-item">
+              <span class="info-label">Versão</span>
+              <span class="info-value">1.0.0 (Fase 3)</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Armazenamento</span>
+              <span class="info-value">localStorage</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Modo</span>
+              <span class="info-value">Offline-first</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="settings-section danger-zone">
+          <h2 class="section-title">Zona de Perigo</h2>
+          <p class="section-description">Ações irreversíveis. Use com cuidado.</p>
+          <button class="btn btn-danger" id="resetBtn" type="button">
+            <span class="btn-icon" aria-hidden="true">🗑️</span>
+            <span>Resetar Todo Progresso</span>
+          </button>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <nav class="bottom-nav" role="navigation" aria-label="Navegação principal">
+    <button class="nav-item active" data-view="home" type="button" aria-current="page">
+      <span class="nav-icon" aria-hidden="true">🏠</span>
+      <span class="nav-label">Início</span>
+    </button>
+    <button class="nav-item" data-view="train" type="button">
+      <span class="nav-icon" aria-hidden="true">💪</span>
+      <span class="nav-label">Treinar</span>
+    </button>
+    <button class="nav-item" data-view="settings" type="button">
+      <span class="nav-icon" aria-hidden="true">⚙️</span>
+      <span class="nav-label">Configurações</span>
+    </button>
+  </nav>
+</div>
+
+<script src="app.js"></script>
